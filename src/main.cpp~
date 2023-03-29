@@ -1,0 +1,164 @@
+#include <math.h>
+#include <stdint.h>
+
+#include <algorithm>
+#include <cmath>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <memory>
+#include <numbers>
+#include <ranges>
+#include <thread>
+#include <vector>
+
+#include "Color.hpp"
+#include "Object.hpp"
+#include "Point.hpp"
+#include "Relativity.hpp"
+
+template <typename T, typename C>
+void trace(FVector<T>& pos, T step_size, const uint32_t num, Color<C>& pixel,
+           float wavelen) {
+    pixel = Color<C>{0, 0, 255};
+
+    FVector<T> dir = FVector<T>{0, -pos[PolAx::r], std::sin(pos[PolAx::phi]),
+                                std::sin(pos[PolAx::theta])};
+    // dir = FVector<T>{0, 0, -1, 0};
+    dir[Ax::t] = std::sqrt(-c / metric(0, 0, pos));
+    dir.euclid_mult(std::sqrt(c / metric(1, 1, pos)) / dir.euclid_space_len());
+
+    for (uint32_t step = 0; num > step; ++step) {
+        // Check if by numerical inaccuracy the position is so close to the
+        // event horizon it might pass into it
+
+        if (pos[PolAx::r] < 1.01 * rs) {
+            pixel = Color<C>{0, 0, 0};
+            return;
+        }
+
+        geodessic_step<T>(pos, dir, step_size);
+
+        // std::cout << step << ": " << pos << std::endl;
+        /*
+        if (pos[PolAx::theta] > std::numbers::pi_v<long double> / 2 - 0.01 &&
+            pos[PolAx::theta] < std::numbers::pi_v<long double> / 2 + 0.01 &&
+            pos[PolAx::r] > 3.5 && pos[PolAx::r] < 5) {
+            pixel = Color<C>{0, 255, 255};
+            // std::terminate();
+            return;
+        }
+        */
+
+        //   for (Object<T, C>& e : obj) {
+        //       if (e == pos) {
+        //           return e.c;
+        //       }
+    }
+    if (pos[PolAx::r] < 1.5) pixel = Color<C>{255, 0, 0};
+    pixel = Color<C>{0, 26, 56};
+    // std::terminate();
+    return;
+}
+
+template <typename T, std::uint16_t W, std::uint16_t H>
+std::array<FVector<T>, W * H> generate_frame(FVector<T> origin, FVector<T> dx,
+                                             FVector<T> dy, T step_size) {
+    std::array<FVector<T>, W * H> frame;
+    frame[0] = origin;
+
+    for (std::uint16_t y{}; y < H; ++y) {
+        for (std::uint16_t x{}; x < W; ++x) {
+            frame[W * y + x] = origin + (dx * x + dy * y) * step_size;
+            // std::cout << frame[W * y + x] << std::endl;
+
+            frame[W * y + x].to_polar();
+            // std::cout << frame[W * y + x] << std::endl;
+        }
+    }
+    return frame;
+}
+
+int main() {
+    using VecType = long double;
+    using ColorType = int;
+    constexpr std::uint16_t Wpx{16};
+    constexpr std::uint16_t Hpx{16};
+    constexpr std::uint16_t W{1};
+    constexpr std::uint16_t H{1};
+
+    /**
+       se origin vector (t,r,phi,theta)
+     **/
+
+    /**
+       semi-cartesian vectors (t,x,y,z) in the locally flat spacetime around the
+     origin
+     **/
+
+    constexpr FVector<VecType> origin{0, 8, -3, 0};
+
+    constexpr FVector<VecType> dx{0, 0, 1, 0};
+    constexpr FVector<VecType> dy{0, 0, 0, 1};
+
+    // std::cout << origin << std::endl;
+    // std::cout << shift << std::endl;
+    //  std::cout << origin + shift << std::endl;
+    std::vector<Object<VecType, ColorType>> obj{
+        {{-2, -2, -2, 0}, {1, 1, 1, 0}, {0, 255, 255}},
+        {{-1, -1, -1, 0}, {1, 1, 1, 0}, {0, 0, 0}},
+        {{0, 0, 0, 0}, {1, 1, 1, 0}, {212, 72, 0}},
+        {{1, 1, 1, 0}, {1, 1, 1, 0}, {72, 212, 0}},
+        {{2, 2, 2, 0}, {1, 1, 1, 0}, {96, 96, 96}}};
+    // std::cout << origin << std::endl;
+    // std::cout << shift << std::endl;
+    std::ofstream file1("Frame1.txt");
+    std::ofstream file2("Frame2.txt");
+    std::ofstream file3("Frame3.txt");
+
+    std::array<FVector<VecType>, Wpx* Hpx> frame =
+        generate_frame<VecType, Wpx, Hpx>(origin, dx, dy, 6.0 / Wpx);
+    std::array<std::thread, Wpx * Hpx> threads;
+    std::array<Color<ColorType>, Wpx * Hpx> img;
+
+    for (FVector<VecType>& v : frame)
+        file1 << std::setprecision(80) << v << std::endl;
+    file1.close();
+
+    // trace<VecType>(origin, shift, 1000000, 5);
+
+    // std::cout << origin << std::endl;
+    // Create and open a text file
+    std::ofstream file("RayTracing.png");
+
+    file << "P3 " << Wpx << " " << Hpx << " 255" << std::endl;
+
+    for (std::uint16_t y{}; y < Hpx; ++y) {
+        for (std::uint16_t x{}; x < Wpx; ++x) {
+            threads[Wpx * y + x] = std::thread(
+                trace<VecType, ColorType>, std::ref(frame[Wpx * y + x]), 0.01,
+                1000, std::ref(img[Wpx * y + x]), 5);
+        }
+    }
+    file3.close();
+    for (std::uint16_t y{}; y < Hpx; ++y) {
+        for (std::uint16_t x{}; x < Wpx; ++x) {
+            file << img[Wpx * y + x];
+        }
+        file << std::endl;
+    }
+
+    for (auto& th : threads) {
+        th.join();
+    }
+
+    std::cout << frame[0] << std::endl;
+
+    for (FVector<VecType>& v : frame) file2 << v << std::endl;
+
+    // Close the file
+    file.close();
+    file2.close();
+
+    return 0;
+}

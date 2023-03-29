@@ -1,0 +1,1 @@
+/usr/local/bin/g++-12  --save-temps -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk -mmacosx-version-min=11.7 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/RayTracing.dir/src/main.cpp.o CMakeFiles/RayTracing.dir/src/Point.cpp.o -o RayTracing 

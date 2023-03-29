@@ -1,0 +1,30 @@
+cmake_minimum_required(VERSION 3.7)
+set(CMAKE_CXX_STANDARD 20)
+
+project(Game3DSDL)
+
+
+#find_file(SDL2_INCLUDE_DIR SDL.h HINTS SDL2 PATHS ~/../../usr/local/Cellar/sdl2/include/SDL2 REQUIRED)
+
+set(SDL2_INCLUDE_DIR /usr/local/Cellar/sdl2/2.26.2/include/SDL2/)
+set(SDL2_IMAGE_INCLUDE_DIR /usr/local/Cellar/sdl2_image/2.6.3/include/SDL2/)
+
+find_library(SDL2_LIBRARY NAME SDL2.h REQUIRED)
+
+find_library(SDL2_IMAGE_LIBRARY NAME SDL2_image.h REQUIRED)
+
+add_executable(${PROJECT_NAME}
+	src/main.cpp
+	src/Game.cpp
+	src/Game.hpp
+	)
+
+
+include_directories(${SDL2_INCLUDE_DIR})
+
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${SDL2_INCLUDE_DIR})
+target_link_libraries(${CMAKE_PROJECT_NAME} ${SDL2_LIBRARY})
+
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE ${SDL2_IMAGE_INCLUDE_DIR})
+target_link_libraries(${CMAKE_PROJECT_NAME} ${SDL2_IMAGE_LIBRARY})    
+

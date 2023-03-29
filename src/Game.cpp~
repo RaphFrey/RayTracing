@@ -1,0 +1,51 @@
+#include<SDL.h>
+#include "Game.hpp"                                            
+#include <algorithm>
+
+Game::Game(){
+    SDL_CreateWindowAndRenderer(680, 480, SDL_WINDOW_RESIZABLE,
+                                &m_game_window, &m_game_window_renderer);
+}
+
+void Game::loop()                                         
+{                                                              
+    bool keep_running = true;                                  
+    while(keep_running)                                        
+    {                                                          
+        while(SDL_PollEvent(&m_game_window_event) > 0)         
+        {                                                      
+            switch(m_game_window_event.type)                   
+            {                                                  
+                case SDL_QUIT:                                 
+                    keep_running = false;                      
+            }                                                  
+        }                                                      
+
+        update(1.0/60.0);                                      
+        draw();                                                
+    }                                                          
+}                                                              
+
+void Game::update(double delta_time){}
+
+void Game::draw(){
+    SDL_RenderClear(m_game_window_renderer);  
+
+    SDL_SetRenderDrawColor(m_game_window_renderer, 255, 255, 255, 255);
+
+    for(std::shared_ptr<GameObject> o : objects)
+        o->draw(m_game_window_renderer);
+    
+    SDL_SetRenderDrawColor(m_game_window_renderer, 0, 0, 0, 255);
+
+    
+    SDL_RenderPresent(m_game_window_renderer);
+}
+
+void Rectangle::draw(SDL_Renderer *renderer){
+    SDL_RenderDrawRect(renderer, &_rectangle);
+}
+SDL_Rect Rectangle::bounding_rect(){
+    return _rectangle;
+}
+
