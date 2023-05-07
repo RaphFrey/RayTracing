@@ -1,3 +1,0 @@
-/Users/rfreyp/Documents/Coding/Computer/C_C++/Games/RayTracing/CMakeFiles/RayTracing.dir
-/Users/rfreyp/Documents/Coding/Computer/C_C++/Games/RayTracing/CMakeFiles/edit_cache.dir
-/Users/rfreyp/Documents/Coding/Computer/C_C++/Games/RayTracing/CMakeFiles/rebuild_cache.dir
