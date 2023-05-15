@@ -27,8 +27,8 @@ CMAKE_BUILD_TYPE:STRING=
 //Enable/Disable color output during build.
 CMAKE_COLOR_MAKEFILE:BOOL=ON
 
-//CXX compiler
-CMAKE_CXX_COMPILER:STRING=/opt/homebrew/bin/g++-12
+//GNU
+CMAKE_CXX_COMPILER:PATH=/opt/homebrew/bin/g++-12
 
 //A wrapper around 'ar' adding the appropriate '--plugin' option
 // for the GCC compiler

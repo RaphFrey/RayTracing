@@ -1,7 +1,0 @@
-from PIL import Image
-import numpy as np
-
-im_frame = Image.open(path_to_file + 'file.png')
-np_frame = np.array(im_frame.getdata())
-
-print(*np_frame,sep = "\n")

@@ -1,4 +1,0 @@
-#include "Point.hpp"
-struct Object {
-    bool hit();
-}
