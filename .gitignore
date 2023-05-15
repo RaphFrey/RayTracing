@@ -1,3 +1,10 @@
+# Misc
+*~
+CMakeFiles*
+CMakeCache.txt
+.DS_Store
+out*
+
 # Prerequisites
 *.d
 
