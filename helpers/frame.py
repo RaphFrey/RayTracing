@@ -16,14 +16,17 @@ ax.set_ylim3d(-10, 10)
 ax.set_zlim3d(-10, 10)
 
 
-X = points[1]*np.cos(points[2])*np.sin(points[3])
-Y = points[1]*np.sin(points[2])*np.sin(points[3])
-Z = points[1]*np.cos(points[3])
+#X = points[1]*np.cos(points[2])*np.sin(points[3])
+#Y = points[1]*np.sin(points[2])*np.sin(points[3])
+#Z = points[1]*np.cos(points[3])
+X = points[1]
+Y = points[2]
+Z = points[3]
 #print(*np.array([X,Y,Z]).transpose(), sep="\n")
 print(points.transpose()[0])
 print(X[0],Y[0],Z[0])
 print(X[-1],Y[-1],Z[-1])
 #ax.scatter3D(X[0],Y[0],Z[0])
-ax.scatter3D(X,Y,Z)
+ax.plot3D(X,Y,Z)
 
 plt.show()

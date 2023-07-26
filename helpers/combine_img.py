@@ -32,7 +32,7 @@ def combine_images(rows, space, images):
 #path = "out/"
 #imges = next(walk(path), (None, None, []))[2]
 #imges = [path+i for i in imges]
-num = 20
+num = 3
 imges = [f"out/Raytracing-{x}-{y}.png" for y in range(num) for x in range(num)]
 print(imges)
 #imges.sort()
