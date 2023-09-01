@@ -1,11 +1,14 @@
 from PIL import Image
 import numpy as np
 import random as r
+import sys
 
-im_frame = Image.open('Disc.png')
-np_frame = np.array(im_frame.getdata()).reshape((1500,3))[::-1]
+im_frame = Image.open(sys.argv[1])
+np_frame = np.array(im_frame.getdata())
 
-with open('Disc.txt',"w") as d:
+with open(sys.argv[1][:-4]+".txt","w") as d:
+    print(im_frame.size)
+    np_frame.flatten()
     for e,c in enumerate(np_frame):
         c = c*2
         for val in c:

@@ -22,7 +22,7 @@
 template <typename T, typename C>
 void trace(FVector<T>& pos, const T cam_phi, const T cam_theta, T step_size,
            const uint32_t num, Color<C>& pixel,
-           const std::vector<std::shared_ptr<Object<T>>>& scene) {
+           const std::vector<std::shared_ptr<ColorObject<T,C>>>& scene) {
   FVector<T> dir = FVector<T>{1, -std::cos(cam_phi)*std::cos(cam_theta), std::sin(cam_phi)*std::cos(cam_theta), std::sin(cam_theta)};
   // bool add = true;
   //std::ofstream file{"Frame2.txt"};
@@ -47,7 +47,7 @@ void trace(FVector<T>& pos, const T cam_phi, const T cam_theta, T step_size,
 
     for (const auto& o : scene) {
       if (o->contains(pos)) {
-	pixel = Color<C>{255, 255, 255};
+	pixel = o->color(pos);
 	return;
       }
     }
@@ -103,19 +103,29 @@ int main() {
 
   const FVector<VecType> dx{0, 0, 1, 0};
   const FVector<VecType> dy{0, 0, 0, 1};
-  constexpr std::uint16_t frames{3};  // frames per side!!!
+  constexpr std::uint16_t frames{20};  // frames per side!!!
   constexpr VecType L{14};
   const FVector<VecType> origin{0, 8, -L / 2, -L / 2};
 
   constexpr VecType cam_phi{0};
   constexpr VecType cam_theta{0};
-  const std::vector<std::shared_ptr<Object<VecType>>> scene{std::make_unique<Difference<VecType>>(
-												  std::make_unique<Ellipse<VecType>>(std::make_unique<FVector<VecType>>(0,0,0,0),
-																     std::make_unique<FVector<VecType>>(0,4.0,4.0,0.1)),
-												  std::make_unique<Ellipse<VecType>>(std::make_unique<FVector<VecType>>(0,0,0,0),
-																     std::make_unique<FVector<VecType>>(0,1.0,1.0,0.1))
-												  )};
-  // std::cout<<rs<<std::endl;
+  /*
+  std::unique_ptr<Difference<VecType>> accretion_disc = std::make_unique<Difference<VecType>>(
+											      std::make_unique<Ellipse<VecType>>(std::make_unique<FVector<VecType>>(0,0,0,0),
+																 std::make_unique<FVector<VecType>>(0,4.0,4.0,0.1)),
+											      std::make_unique<Ellipse<VecType>>(std::make_unique<FVector<VecType>>(0,0,0,0),
+																 std::make_unique<FVector<VecType>>(0,1.0,1.0,0.1))
+											      );
+  */
+  std::unique_ptr<Image<VecType,ColorType, 2400, 1200>> background = std::make_unique<Image<VecType, ColorType, 2400, 1200>>(std::make_unique<Cube<VecType>>(std::make_unique<FVector<VecType>>(0,-8, -L / 2, -L / 2),
+																		 std::make_unique<FVector<VecType>>(0,-8.5, L / 2, L / 2)));
+  background->load_image("Textures/Image1.txt");
+
+
+  const std::vector<std::shared_ptr<ColorObject<VecType,ColorType>>> scene{//std::make_unique<Colorize<VecType,ColorType>>(std::move(accretion_disc)),
+									   std::move(background)};
+	
+  // Std::cout<<rs<<std::endl;
   /*
     origin = FVector<VecType>{0, 8, 0, 5};
     origin.to_polar();
